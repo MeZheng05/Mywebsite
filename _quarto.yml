@@ -3,19 +3,32 @@ project:
   output-dir: docs
 
 website:
-  title: "Mywebsite"
+  title: "my-website"
   navbar:
     left:
       - href: index.qmd
         text: Home
       - href: about.qmd
-        text: About
+        text: About Me
+      - text: Analysis
+        menu: 
+          - href: Analysis1.qmd
+            text: Analysis1
+          - href: Analysis2.qmd
+            text: Analysis2
+          - href: Analysis3.qmd
+            text: Analysis3
+
+execute:
+  echo: true       # Whether to display code (true/false)
+  warning: false   # Globally suppress warnings
+  error: false     # Globally suppress errors
+  message: false   # Globally suppress general messages
 
 format:
   html:
     theme:
-      - cosmo
-      - brand
+      - minty
     css: styles.css
     toc: true
 

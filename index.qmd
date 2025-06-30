@@ -2,10 +2,10 @@
 title: "Mywebsite"
 ---
 
-This is a Quarto website.
 
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+![](image.png){width="70%" .center}
 
-```{r}
-1 + 1
-```
+
+Hi! Welcome to my website. My name is Meilin Zheng. I currently a freelance data analyst, focusing on healthcare and biomedical sciences. I got my master degree from the Biostatistics department at Johns Hopkins University in May 2025. 
+
+I bring rigorous analytical training and cutting-edge technical skills to:

@@ -4,13 +4,34 @@
     "href": "index.html",
     "title": "Mywebsite",
     "section": "",
-    "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites.\n\n1 + 1\n\n[1] 2"
+    "text": "Hi! Welcome to my website. My name is Meilin Zheng. I currently a freelance data analyst, focusing on healthcare and biomedical sciences. I got my master degree from the Biostatistics department at Johns Hopkins University in May 2025.\nI bring rigorous analytical training and cutting-edge technical skills to:"
   },
   {
     "objectID": "about.html",
     "href": "about.html",
     "title": "About",
     "section": "",
-    "text": "About this site\n\n1 + 1\n\n[1] 2"
+    "text": "Education\nJohns Hopkins University, MHS in Biostatistics Aug 2023 - May 2025\nUniversity of New Mexico, BS in Statistics; BA in Economics Aug 2019 - May 2023\n\n\nExpertise\n\n\nProjects Completed\n{r}\nlibrary(ggplot2)\ndata &lt;- data.frame(\n  field = c(\"Clinical Trials\", \"Epidemiology\", \"Real World Evidence (RWE)\"),\n  projects = c(12, 8, 5)\n)\nggplot(data, aes(field, projects, fill=field)) + \n  geom_col(show.legend=FALSE) +\n  labs(x=NULL, y=\"Projects Completed\") +\n  theme_minimal()\n\n\n\nEcademic Publications\nlink to this publication"
+  },
+  {
+    "objectID": "Analysis1.html",
+    "href": "Analysis1.html",
+    "title": "Analysis1",
+    "section": "",
+    "text": "The purpose of this analysis is to explore the relationship between age (in months) and weight (in kilogram) among 185 infants aged 0 to 60 months in Nepal."
+  },
+  {
+    "objectID": "Analysis1.html#a-visualization-on-the-trend-of-weight-as-age-in-months-increases",
+    "href": "Analysis1.html#a-visualization-on-the-trend-of-weight-as-age-in-months-increases",
+    "title": "Analysis1",
+    "section": "A Visualization on the Trend of Weight as Age in Months Increases",
+    "text": "A Visualization on the Trend of Weight as Age in Months Increases\n\n# Kernel smooth \nks.fit &lt;- with(nepalantro, ksmooth(age,wt, bandwidth=20))\n# Plot\nggplot(data=nepalantro, aes(x=age,y=wt)) + \n  geom_point(aes(color=as.factor(sex)), position=position_jitter(width=0.1,height=0.1),alpha=0.7) +\n  geom_smooth(aes(linetype=\"ns\"),method=\"lm\", formula=y~ splines::ns(x,3),se=FALSE) +\n  geom_smooth(aes(linetype=\"loess\"),method=\"loess\",span=0.5,se=FALSE) +\n  geom_line(aes(x=age,y=ks.fit$y,linetype=\"kernel\"))+\n  labs(x=\"Age(months)\",y=\"Weight(kg)\",title=\"Nepali Children Study\") +\n  scale_colour_manual(name=\"Gender\",values=c(\"1\"=\"red\",\"2\"=\"green\"), labels=c(\"Male\",\"Female\")) +\n  scale_linetype_manual(name=\"Smoothing\", values= c(ns=\"dotted\",loess=\"dashed\",kernel=\"solid\")) +\n  theme_bw() +\n  theme(plot.title= element_text(hjust=0.5)) +\n  scale_x_continuous(breaks=seq(0,60,6),limits=c(0,60))\n\n\n\n\n\n\n\n#pick three ages, 6, 30, 60, calculate mean weight\nsetDT(nepalantro)\nresult &lt;- nepalantro[age %in% c(12, 36, 60), .(Mean_Weight = mean(wt, na.rm = TRUE), Sd_Weight = sd(wt, na.rm = TRUE)), by = age] # . means make a list \nprint(result)\n\n     age Mean_Weight Sd_Weight\n   &lt;num&gt;       &lt;num&gt;     &lt;num&gt;\n1:    12    6.914286 1.0838644\n2:    36   11.025000 1.5452693\n3:    60   12.150000 0.3535534"
+  },
+  {
+    "objectID": "Analysis1.html#a-summary-on-the-trend-of-weigth-by-sex",
+    "href": "Analysis1.html#a-summary-on-the-trend-of-weigth-by-sex",
+    "title": "Analysis1",
+    "section": "A Summary on the Trend of Weigth by Sex",
+    "text": "A Summary on the Trend of Weigth by Sex\n\nggplot(data=nepalantro, aes(x=age,y=wt,color = as.factor(sex))) + \n  geom_point(aes(color=as.factor(sex)), position=position_jitter(width=0.1,height=0.1),alpha=0.7) +\n  geom_smooth(method = \"loess\", span = 0.5, se = FALSE) + \n  labs(x=\"Age(months)\",y=\"Weight(kg)\",title=\"Nepali Children Study\") +\n  scale_colour_manual(name=\"Gender\",values=c(\"1\"=\"red\",\"2\"=\"green\"), labels=c(\"Male\",\"Female\")) +\n  theme_bw() +\n  theme(plot.title= element_text(hjust=0.5)) +\n  scale_x_continuous(breaks=seq(0,60,6),limits=c(0,60))\n\n\n\n\n\n\n\nsetDT(nepalantro)\nresult &lt;- nepalantro[age %in% c(12, 36, 60), .(Mean_wt = mean(wt)), by = .(sex, age)]\nprint(result)\n\n     sex   age   Mean_wt\n   &lt;num&gt; &lt;num&gt;     &lt;num&gt;\n1:     2    12  7.283333\n2:     1    12  4.700000\n3:     2    36 11.033333\n4:     1    36 11.020000\n5:     1    60 12.150000"
   }
 ]
