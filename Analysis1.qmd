@@ -8,12 +8,12 @@ The purpose of this analysis is to explore the relationship between age (in mont
 
 # Method
 
-In this project, we utilized three modeling techniques: linear regression, multiple regression with splines (linear spline, cubic spline, and natural spline), and multiple linear regression with adjusting covariate height.
+To model the relationship between children's weight and age, we employed three approaches: (1) simple linear regression as a baseline model; (2) multiple linear regression incorporating linear/cubic splines of age to capture potential non-linear associations; and (3) a semi-parametric natural spline approach to ensure stable estimates at the boundaries of the age distribution. Additionally, we extended our multiple linear regression framework to adjust for height as a covariate, enabling assessment of the age-weight relationship independent of height. Spline models were implemented using restricted cubic basis functions with carefully selected knots to balance flexibility and parsimony.
 
-We checked modeling assumptions, utilized visualization to compare the goodness of fit of each model, and used cross-validation to compare MSEs across models.
+We checked modeling assumptions, utilized visualization to compare the goodness of fit of each model. We also compared cross-validated MSEs to assess fitting accuracy across models and to select the optimal one.
 
 ::: callout-note
-This is a class project from the Method in Biostatistics III class under Dr. Elizabeth Colunati.
+This is a class project from the Method in Biostatistics III class under Dr. Elizabeth Colantuoni.
 :::
 
 ```{r}
@@ -21,6 +21,8 @@ library(tidyverse)
 library(ggplot2)
 library(splines)
 library(data.table)
+library(scatterplot3d)
+library(rgl)
 ```
 
 # Analysis
@@ -48,7 +50,7 @@ ggplot(data=nepalantro, aes(x=age,y=wt)) +
   geom_line(aes(x=age,y=ks.fit$y,linetype="kernel"))+
   labs(x="Age(months)",y="Weight(kg)",title="Nepali Children Study") +
   scale_colour_manual(name="Gender",values=c("1"="red","2"="green"), labels=c("Male","Female")) +
-  scale_linetype_manual(name="Smoothing", values= c(ns="dotted",loess="dashed",kernel="solid")) +
+  scale_linetype_manual(name="Smoothing", values= c(ns="dotted",loess="dashed",kernel="longdash")) +
   theme_bw() +
   theme(plot.title= element_text(hjust=0.5)) +
   scale_x_continuous(breaks=seq(0,60,6),limits=c(0,60))
@@ -75,17 +77,135 @@ result <- nepalantro[age %in% c(12, 36, 60), .(Mean_wt = mean(wt)), by = .(sex, 
 print(result)
 ```
 
-# Simple Linear Regression 
+## Simple Linear Regression
 
 ```{r}
+slr <- lm(wt ~ I(age - 12), nepalantro)
+ggplot(data = nepalantro, aes(x = age, y = wt)) + geom_point(aes(color = as.factor(sex)),
+ position = position_jitter(width = 0.1, height = 0.1), alpha = 0.7 ) +
+ geom_smooth(aes(linetype = "slr"), method="lm", col="black", span = 0.5, se = FALSE) +
+ geom_smooth(aes(linetype = "ns"), method = "lm", formula = y ~ splines::ns(x,3), se = FALSE) +
+ geom_smooth(aes(linetype = "loess"), method = "loess", span = 0.5, se = FALSE) +
+ geom_line(aes(x = age, y = ks.fit$y, linetype = "kernel")) +
+ labs(x = "Age (months)", y = "Weight (kg)", title = "Nepali Children Study") + # modify axis,title
+ scale_colour_manual(name = "Gender",
+ values = c("1" = "red", "2" = "green"),
+ labels = c("Male", "Female")) +
+ scale_linetype_manual(name="Smoothing", values = c(ns="dotted",loess="dashed",kernel="longdash", slr = "solid")) +
+ theme_bw() +
+ theme(plot.title = element_text(hjust = 0.5)) +
+ scale_x_continuous(breaks=seq(0,60,6),limits=c(0,60))
+```
 
+::: callout-important
+The simple linear regression over-estimates weight for children under 6 months and under-estimates weight for children above 51 months.The simple linear regression also has an assumption of equal variances, meaning that the variation of weight should be roughly the same across different ages. However, as age increases, the variation in observed weights for a given age increases. Therefore, the simple linear regression is not a good option to accuratly model the weight-age association.
+:::
+
+## Multiple Linear Regression With Linear and Cubic Splines
+
+```{r}
+# Linear Spline
+nepalantro$age_c <- nepalantro$age - 6
+nepalantro$age_sp6 <- ifelse(nepalantro$age > 6, nepalantro$age - 6, 0)
+nepalantro$age_sp12 <- ifelse(nepalantro$age > 12, nepalantro$age - 12, 0)
+mlr1 <- lm(wt ~ age_c + age_sp6 + age_sp12, data = nepalantro)
+
+# Cubic Regression Spline
+nepalantro$age_2 <- (nepalantro$age - 6)^2 
+nepalantro$age_3 <- (nepalantro$age - 6)^3
+nepalantro$age_cbs <- ifelse(nepalantro$age > 6, (nepalantro$age-6)^3, 0)
+mlr2 <- lm(wt ~ age_c + age_2 + age_3 + age_cbs, data = nepalantro)
+
+d <- data.frame(
+  age = c(nepalantro$age, nepalantro$age), 
+  fittedvalues = c(mlr1$fitted.values, mlr2$fitted.values), 
+  Spline = c(rep("Linear Spline", nrow(nepalantro)), rep("Cubic Spline", nrow(nepalantro)))
+)
+
+ggplot(data=nepalantro,aes(x=age,y=wt)) +
+ geom_jitter(alpha=0.7)+theme_bw() +   #geom_jitter plots dots
+ geom_line(data=d ,aes(x=age, y=fittedvalues,color=Spline)) +
+ labs(x="Age(months)",y="Weight(kg)",title="NepaliChildrenStudy") +
+ theme(plot.title=element_text(hjust=0.5)) +
+ scale_x_continuous(breaks=seq(0,60,6),limits=c(0,60))+
+ scale_color_manual(values=c("red","blue"))
 ```
 
 
+## Natural Spline Regression 
 
-# Multiple Linear Regression With Natural Spline 
+Natural spline is a 
 
 ```{r}
+mlr3 <- lm(wt ~ ns(age, 3), data = nepalantro)
+d <-data.frame(age=c(d$age,d$age,d$age),
+ fittedvalues= c(mlr1$fitted.values,mlr2$fitted.values,mlr3$fitted.values),
+ Spline=factor(c(rep("LinearSpline", nrow(nepalantro)), rep("CubicSpline", nrow(nepalantro)), rep("NaturalCubicSpline", nrow(nepalantro))),
+ levels= c("LinearSpline","CubicSpline","NaturalCubicSpline")))
 
+ggplot(data=nepalantro,aes(x=age,y=wt)) +
+ geom_jitter(alpha=0.7) +theme_bw()+
+ geom_line(data=d,aes(x=age, y=fittedvalues,color=Spline)) +
+ labs(x="Age(months)",y="Weight(kg)",title="NepaliChildrenStudy") +
+ theme(plot.title=element_text(hjust=0.5))+
+ scale_x_continuous(breaks=seq(0,60,6),limits=c(0,60)) +
+ scale_color_manual(values=c("blue","red","green"))
 ```
 
+
+Cubic Spline and Natural Cubic Spline performs similar. Natural spline with 3 degrees of freedom looks smoother than cubic spline. 
+
+
+## Selecting Models -- Comapring Cross-Validated MSEs
+
+Model fitting across models was assessed based on 10 fold cross-validated mean squared error. 
+
+```{r}
+set.seed(12345)
+id_rand <- runif(nrow(nepalantro))
+nepalantro$cv_group <- ntile(id_rand, 10)
+cv_error <- matrix(nrow=10,ncol=8)
+cv_error_mlr1 <- numeric(10)                    
+cv_error_mlr2 <- numeric(10)          
+for (j in 1:10) {
+  test <- nepalantro[nepalantro$cv_group == j, ]
+  train <- nepalantro[nepalantro$cv_group != j, ]
+  for (df in 1:8) {
+    fit_ns <- lm(wt ~ ns(age, df = df), data = train)
+    pred_ns <- predict(fit_ns, test)
+    cv_error[j, df] <- mean((test$wt - pred_ns)^2)
+  }
+  
+  fit_mlr1 <- lm(wt ~ age_c + age_sp6 + age_sp12, data = train)
+  pred_mlr1 <- predict(fit_mlr1, test)
+  cv_error_mlr1[j] <- mean((test$wt - pred_mlr1)^2)
+
+  fit_mlr2 <- lm(wt ~ age_c + age_2 + age_3 + age_cbs, data = train)
+  pred_mlr2 <- predict(fit_mlr2, test)
+  cv_error_mlr2[j] <- mean((test$wt - pred_mlr2)^2)
+}
+
+MSE <- cbind(cv_error, cv_error_mlr1, cv_error_mlr2)
+mean_mse <- apply(MSE, 2, mean)
+
+par(mfrow = c(1, 2), mar = c(4, 4, 3, 1))  
+
+plot(1:8,mean_mse[1:8],ylim=c(1,2.5),xlab="DegreesofFreedom",ylab="MSE",
+ main="CrossValidatedMSE NaturalSpline",xaxt="n",pch=17,col=1:8)
+ text(1:8, mean_mse[1:8]-0.2,labels=signif(mean_mse[1:8],3),col=1:8)
+ axis(1,at=c(1:8),labels=1:8,tick=FALSE)
+ 
+plot(9:10,mean_mse[9:10],ylim=c(1,2.5),xlab = "Model", ylab="MSE",
+ main="CrossValidatedMSE Regression",xaxt="n",pch=17,col=9:10)
+ text(9:10, mean_mse[9:10]-0.2,labels=signif(mean_mse[9:10],3),col=9:10)
+ axis(1,at=c(9:10), labels=c("MLR_LinearSpline", "MLR_CubicSpline"),tick=FALSE)
+```
+
+::: callout-important
+Cubic spline regression achieved optimal predictive performance (CV-MSE = 1.80). Natural spline with a degrees of freedom of 2 performs comparably well (MSE = 1.83 at df=2). Cubic spline regression results in a 9.1% error reduction over the linear benchmark (MSE = 1.98)
+:::
+
+
+# Summary 
+
+In summary, 

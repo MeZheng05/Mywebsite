@@ -13,7 +13,7 @@ website:
       - text: Analysis
         menu: 
           - href: Analysis1.qmd
-            text: Analysis1
+            text: A Spline Regression Approach on Modeling Non-Linear Weight-Height Relationships in Nepali Children
           - href: Analysis2.qmd
             text: Analysis2
           - href: Analysis3.qmd
