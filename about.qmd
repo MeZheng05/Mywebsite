@@ -2,36 +2,34 @@
 title: "About"
 ---
 
-![](1.jpg){width="70%" .center}
+![](1.jpg){.center width="70%"}
 
-# Education 
+# Education
 
-Johns Hopkins University, MHS in Biostatistics     Aug 2023 - May 2025 
+Johns Hopkins University, MHS in Biostatistics Aug 2023 - May 2025
 
-University of New Mexico, BS in Statistics; BA in Economics    Aug 2019 - May 2023
+University of New Mexico, BS in Statistics; BA in Economics Aug 2019 - May 2023
 
-# Expertise 
+# Experitise
 
+-   Statistical Simulation
 
+Advanced simulation techniques including missing data imputation (multiple imputation, EM algorithm) and Markov Chain Monte Carlo (MCMC) for Bayesian inference (Gibbs sampling).
 
-# Projects Completed 
+-   Predictive & Multivariate Modeling
 
-```
-{r}
-library(ggplot2)
-data <- data.frame(
-  field = c("Clinical Trials", "Epidemiology", "Real World Evidence (RWE)"),
-  projects = c(12, 8, 5)
-)
-ggplot(data, aes(field, projects, fill=field)) + 
-  geom_col(show.legend=FALSE) +
-  labs(x=NULL, y="Projects Completed") +
-  theme_minimal()
+    Survival analysis (Cox PH, Kaplan-Meier)
 
-```
+    Longitudinal data (GLMM, GEE, mixed-effects models)
 
-# Ecademic Publications 
+    Regression (linear, log-linear, Poisson)
 
+    Machine learning (Random Forest, clustering, PCA)
 
+-   Data cleaning/wrangling (SQL, R, STATA, Python, SAS)
 
-[link to this publication](http://journals.sagepub.com/doi/10.1177/21501319251347906?utm_source=selligent&utm_medium=email&utm_campaign=joa_con_authc_multi_publishedauthorcarejourney&utm_content=23u0062_ao&utm_term=&m_i=fM1eZQJ_WgNmvOv4AWWWfuLi%2BoR8HpKmQ5ONfaJScCsqUadbBJZ4%2BqQNO%2Byvru7vJYZEr%2BZktUGztsrttgoSZHzzLexVocttSo8bf4&nbd=58212500&nbd_source=slgnt&M_BT=1694356571968446)
+# Academic Publications
+
+Prichett LM, Young AS, Wu E, et al. Patterns of Antidepressant and Antianxiety Medication Prescriptions in Pediatric Primary Care in the U.S. Journal of Primary Care & Community Health. 2025;16. doi:10.1177/21501319251347906
+
+[link to this publication](http://journals.sagepub.com/doi/10.1177/21501319251347906?utm_source=selligent&utm_medium=email&utm_campaign=joa_con_authc_multi_publishedauthorcarejourney&utm_content=23u0062_ao&utm_term=&m_i=fM1eZQJ_WgNmvOv4AWWWfuLi%2BoR8HpKmQ5ONfaJScCsqUadbBJZ4%2BqQNO%2Byvru7vJYZEr%2BZktUGztsrttgoSZHzzLexVocttSo8bf4&nbd=58212500&nbd_source=slgnt&M_BT=1694356571968446) 

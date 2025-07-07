@@ -206,6 +206,29 @@ Cubic spline regression achieved optimal predictive performance (CV-MSE = 1.80).
 :::
 
 
+## Height-adjusted Age-weight Association 
+
+```{r}
+plot3d(nepalantro$age, nepalantro$ht, nepalantro$wt)
+scatterplot3d(nepalantro$age, nepalantro$ht, nepalantro$wt, pch = 16, type = "h", highlight.3d = TRUE,
+ xlab = "age (months)", ylab = "height (cm)",
+ zlab = "weight (grams)", main = "Nepal Children's Study")
+```
+
+Height is highly associated with weight and age. 
+
+```{r}
+# Simple Linear Regression, adjusted with height 
+mlr3 <- lm(wt ~ I(age-12) + I(ht-85), data=nepalantro)
+summary(mlr3)
+summary(slr)
+```
+
+A multiple linear regression was used to describe the association of weight and age of 185 Nepal children aged 1 to 60 months after adjusting for height. We estimated that among children of same height,the average difference in weight of children who differ in age by 1 month is 0.005kg (95% confidence interval: -0.015 to 0.025). In the regression of weight on age,we estimated that the average difference in weight of children who differ
+ by one month of age is 0.157kg (95% confidence interval: 0.145 to 0.169). After adjusting for height, weight and age are not associated. 
+
 # Summary 
 
-In summary, 
+We investigated the non-linear relationship between age and weight using multiple linear regression with spline functions. Among the tested models (linear splines, natural splines with 2–8 degrees of freedom, and cubic splines), the cubic spline regression demonstrated superior performance, reducing cross-validated mean squared error (CV-MSE) by 9.1% compared to simple linear regression.
+
+Additionally, we fit a multiple linear regression model of weight on both age and height. After adjusting for height, the association between age and weight was no longer statistically significant. 

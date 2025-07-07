@@ -177,6 +177,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#multiple-linear-regression-with-linear-and-cubic-splines" id="toc-multiple-linear-regression-with-linear-and-cubic-splines" class="nav-link" data-scroll-target="#multiple-linear-regression-with-linear-and-cubic-splines">Multiple Linear Regression With Linear and Cubic Splines</a></li>
   <li><a href="#natural-spline-regression" id="toc-natural-spline-regression" class="nav-link" data-scroll-target="#natural-spline-regression">Natural Spline Regression</a></li>
   <li><a href="#selecting-models-comapring-cross-validated-mses" id="toc-selecting-models-comapring-cross-validated-mses" class="nav-link" data-scroll-target="#selecting-models-comapring-cross-validated-mses">Selecting Models – Comapring Cross-Validated MSEs</a></li>
+  <li><a href="#height-adjusted-age-weight-association" id="toc-height-adjusted-age-weight-association" class="nav-link" data-scroll-target="#height-adjusted-age-weight-association">Height-adjusted Age-weight Association</a></li>
   </ul></li>
   <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
   </ul>
@@ -482,10 +483,76 @@ Important
 </div>
 </div>
 </section>
+<section id="height-adjusted-age-weight-association" class="level2">
+<h2 class="anchored" data-anchor-id="height-adjusted-age-weight-association">Height-adjusted Age-weight Association</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot3d</span>(nepalantro<span class="sc">$</span>age, nepalantro<span class="sc">$</span>ht, nepalantro<span class="sc">$</span>wt)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">scatterplot3d</span>(nepalantro<span class="sc">$</span>age, nepalantro<span class="sc">$</span>ht, nepalantro<span class="sc">$</span>wt, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">type =</span> <span class="st">"h"</span>, <span class="at">highlight.3d =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a> <span class="at">xlab =</span> <span class="st">"age (months)"</span>, <span class="at">ylab =</span> <span class="st">"height (cm)"</span>,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a> <span class="at">zlab =</span> <span class="st">"weight (grams)"</span>, <span class="at">main =</span> <span class="st">"Nepal Children's Study"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Analysis1_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Height is highly associated with weight and age.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple Linear Regression, adjusted with height </span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>mlr3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(wt <span class="sc">~</span> <span class="fu">I</span>(age<span class="dv">-12</span>) <span class="sc">+</span> <span class="fu">I</span>(ht<span class="dv">-85</span>), <span class="at">data=</span>nepalantro)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mlr3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = wt ~ I(age - 12) + I(ht - 85), data = nepalantro)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-2.48498 -0.53548  0.01508  0.51986  2.77917 
+
+Coefficients:
+             Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) 11.154244   0.256679  43.456   &lt;2e-16 ***
+I(age - 12)  0.005368   0.010169   0.528    0.598    
+I(ht - 85)   0.228086   0.014205  16.057   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.9035 on 182 degrees of freedom
+Multiple R-squared:  0.9163,    Adjusted R-squared:  0.9154 
+F-statistic: 995.8 on 2 and 182 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(slr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = wt ~ I(age - 12), data = nepalantro)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.7237 -0.8276  0.1854  0.9183  4.5043 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) 7.328565   0.148016   49.51   &lt;2e-16 ***
+I(age - 12) 0.157003   0.005845   26.86   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 1.401 on 183 degrees of freedom
+Multiple R-squared:  0.7977,    Adjusted R-squared:  0.7966 
+F-statistic: 721.4 on 1 and 183 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>A multiple linear regression was used to describe the association of weight and age of 185 Nepal children aged 1 to 60 months after adjusting for height. We estimated that among children of same height,the average difference in weight of children who differ in age by 1 month is 0.005kg (95% confidence interval: -0.015 to 0.025). In the regression of weight on age,we estimated that the average difference in weight of children who differ by one month of age is 0.157kg (95% confidence interval: 0.145 to 0.169). After adjusting for height, weight and age are not associated.</p>
+</section>
 </section>
 <section id="summary" class="level1">
 <h1>Summary</h1>
-<p>In summary,</p>
+<p>We investigated the non-linear relationship between age and weight using multiple linear regression with spline functions. Among the tested models (linear splines, natural splines with 2–8 degrees of freedom, and cubic splines), the cubic spline regression demonstrated superior performance, reducing cross-validated mean squared error (CV-MSE) by 9.1% compared to simple linear regression.</p>
+<p>Additionally, we fit a multiple linear regression model of weight on both age and height. After adjusting for height, the association between age and weight was no longer statistically significant.</p>
 
 
 </section>
